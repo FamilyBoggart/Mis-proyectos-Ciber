@@ -27,10 +27,55 @@ function cidr2mask {
 	echo $ip_addr
 }
 
+function ipreader {
+
+	local byte
+	gateway=""
+	broadcast=""
+
+	for((i=1;i<=4;i++))
+	do
+		byte=$(echo $subnet | cut -d"." -f$i)
+		if [ $byte -ne 255 ]
+		then
+			local bit=$((255- $byte))
+			local count=0
+			if [ $bit -ne 0 ]
+			then
+				while (( $bit > 0))
+				do
+					echo $bit
+					bit=$(($bit / 2))
+					((count++))
+				done
+			fi
+			## PAUSA: En este punto necesitamos crear una funcion capaz de desengranar el octeto de la IP para ver que numero coinciden con la mascara de subred
+			break
+		else
+			gateway+=$(echo $ip | cut -d"." -f$i)
+			broadcast+=$(echo $ip | cut -d"." -f$i)
+			if [ $i -ne 4 ]
+			then 
+				gateway+="."
+				broadcast+="."
+			fi
+		fi	
+	done
+
+	
+
+	echo "Bytes needed: $count"
+	#READ IP_ADDRESS _FUNCTION
+	echo -e "IP Address:\t\t$ip"
+	echo -e "Subnet mask:\t\t$subnet"
+	echo -e "Default gateway:\t$gateway"
+	echo -e "Broadcast address:\t$broadcast"
+}
+
 function main_addr {
 
-	local subnet
-	local ip
+	subnet=""
+	ip=""
 
 	if [ $# -eq 1 ]
 	then
@@ -42,10 +87,9 @@ function main_addr {
 		ip=$1
 		subnet=$2
 	fi
-	#READ IP_ADDRESS _FUNCTION
-	echo -e "IP Address:\t$ip"
-	echo -e "Subnet mask:\t$subnet"
+	ipreader $ip $subnet
 }
+
 if [ $# -eq 1 ]
 then
 	main_addr $1
@@ -53,6 +97,7 @@ elif [ $# -eq 2 ]
 then
 	main_addr $1 $2
 else
-	echo -e "\nThe correct usage is: \n\t./subnet_calculator.sh <CIDR_number>"
-	echo -e "\nA CIDR number must be between 0 - 32"
+	echo -e "\nThe correct usage is: \n"
+	echo -e "\tbash subnet_calculator.sh <IPv4> <SUBNET MASK>"
+	echo -e "\tbash subnet_calculator.sh <IP/CIDR>"
 fi
