@@ -27,9 +27,31 @@ function cidr2mask {
 	echo $ip_addr
 }
 
-if [ $# -eq 1 ] && [ $1 -lt 33 ] && [ $1 -ge 0 ]
+function main_addr {
+
+	local subnet
+	local ip
+
+	if [ $# -eq 1 ]
+	then
+		ip=$(echo $1 | cut -d"/" -f1)
+		subnet=$(echo $1 | cut -d"/" -f2)
+		subnet=$(cidr2mask $subnet)
+	elif [ $# -eq 2 ]
+	then
+		ip=$1
+		subnet=$2
+	fi
+	#READ IP_ADDRESS _FUNCTION
+	echo -e "IP Address:\t$ip"
+	echo -e "Subnet mask:\t$subnet"
+}
+if [ $# -eq 1 ]
 then
-	cidr2mask $1
+	main_addr $1
+elif [ $# -eq 2 ]
+then
+	main_addr $1 $2
 else
 	echo -e "\nThe correct usage is: \n\t./subnet_calculator.sh <CIDR_number>"
 	echo -e "\nA CIDR number must be between 0 - 32"
