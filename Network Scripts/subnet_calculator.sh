@@ -27,6 +27,25 @@ function cidr2mask {
 	echo $ip_addr
 }
 
+function byte_recon {
+
+	local net_part=$((8-$2))
+	local binary=$(./../Utils/data_conversor.sh dig_to_byte $1)
+	local bin_gateway=${binary:0:$net_part}
+	local bin_broadcast=${binary:0:$net_part}
+	local counter=$net_part
+
+	while (($counter <= 8))
+	do
+		bin_gateway+="0"
+		bin_broadcast+="1"
+		((counter++))
+	done	
+
+	gateway+=$(./../Utils/data_conversor.sh byte_to_dig $bin_gateway)
+	broadcast+=$(./../Utils/data_conversor.sh byte_to_dig $bin_broadcast)	
+}
+
 function ipreader {
 
 	local byte
@@ -40,32 +59,29 @@ function ipreader {
 		then
 			local bit=$((255- $byte))
 			local count=0
+			local octet
 			if [ $bit -ne 0 ]
 			then
 				while (( $bit > 0))
 				do
-					echo $bit
 					bit=$(($bit / 2))
 					((count++))
 				done
 			fi
-			## PAUSA: En este punto necesitamos crear una funcion capaz de desengranar el octeto de la IP para ver que numero coinciden con la mascara de subred
-			break
+			octet=$(echo $ip | cut -d"." -f$i)
+			byte_recon $octet $count
 		else
 			gateway+=$(echo $ip | cut -d"." -f$i)
 			broadcast+=$(echo $ip | cut -d"." -f$i)
-			if [ $i -ne 4 ]
-			then 
-				gateway+="."
-				broadcast+="."
-			fi
-		fi	
+					
+		fi
+		if [ $i -ne 4 ]
+		then 
+			gateway+="."
+			broadcast+="."
+		fi			
 	done
 
-	
-
-	echo "Bytes needed: $count"
-	#READ IP_ADDRESS _FUNCTION
 	echo -e "IP Address:\t\t$ip"
 	echo -e "Subnet mask:\t\t$subnet"
 	echo -e "Default gateway:\t$gateway"
