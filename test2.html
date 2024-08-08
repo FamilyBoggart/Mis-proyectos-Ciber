@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test 2</title>
+</head>
+<body>
+    <h1>Tus Datos</h1>
+    <p>Nombre de Usuario: <span id="username"></span></p>
+    <p>Contraseña: <span id="password"></span></p>
+
+    <script>
+        // Función para obtener los parámetros de la URL
+        function getParameterByName(name) {
+            let url = window.location.href;
+            let regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            let results = regex.exec(url);
+            return results === null? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        }
+
+        // Obtener los parámetros de la URL
+        const username = getParameterByName('username');
+        const password = getParameterByName('password');
+
+        // Mostrar los datos en la página
+        document.getElementById('username').textContent = username;
+        document.getElementById('password').textContent = password;
+    </script>
+</body>
+</html>

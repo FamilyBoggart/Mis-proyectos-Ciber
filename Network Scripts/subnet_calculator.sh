@@ -30,7 +30,7 @@ function cidr2mask {
 function byte_recon {
 
 	local net_part=$((8-$2))
-	local binary=$(./../Utils/data_conversor.sh dig_to_byte $1)
+	local binary=$(./Utils/data_conversor.sh dig_to_byte $1)
 	local bin_gateway=${binary:0:$net_part}
 	local bin_broadcast=${binary:0:$net_part}
 	local counter=$net_part
@@ -42,8 +42,8 @@ function byte_recon {
 		((counter++))
 	done	
 
-	gateway+=$(./../Utils/data_conversor.sh byte_to_dig $bin_gateway)
-	broadcast+=$(./../Utils/data_conversor.sh byte_to_dig $bin_broadcast)	
+	gateway+=$(./Utils/data_conversor.sh byte_to_dig $bin_gateway)
+	broadcast+=$(./Utils/data_conversor.sh byte_to_dig $bin_broadcast)	
 }
 
 function ipreader {
